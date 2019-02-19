@@ -4,61 +4,53 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
-
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlParagraph;
+import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 
 
 public class WebScrapingTest {
-	private static WebClient webClient = null;
-	String baseUrl = "https://bikroy.com/bn/ads/bangladesh/jobs";
-
-	@Test
-	public void testWebScrap() throws Exception {
-	WebClient webClient = new WebClient();
+	private static final WebClient CLIENT= getClient();
+	private String Url = "https://bikroy.com/bn/ads/bangladesh/jobs";
 	
-	webClient.getOptions().setJavaScriptEnabled(false); 
-	
-	HtmlPage page = webClient.getPage("https://bikroy.com/bn/ads/bangladesh/jobs");
-	
-	System.out.println(page.getTitleText());
-	System.out.println();
+	private static WebClient getClient() {
+		WebClient myClient= new WebClient();
+		myClient.getOptions().setTimeout(10*1000);
+		myClient.getOptions().setJavaScriptEnabled(false);
+		myClient.getOptions().setCssEnabled(false);
+		myClient.setJavaScriptTimeout(8*1000);
+		myClient.getOptions().getSSLInsecureProtocol();
+		return myClient;
 	}
 	
-	
-	public void getScrapedJobs(HtmlPage page) throws IOException {
-	try {
+	@Test
+	public void getScrapedJobs() throws IOException, InterruptedException {
+		HtmlPage page = CLIENT.getPage(Url);
+		CLIENT.waitForBackgroundJavaScript(8*1000);
+		Thread.sleep(3*1000);
+		System.out.println(page.getUrl());
+		System.out.println(page.getTitleText());
+		System.out.println();
 		
 		
-	List<HtmlElement> list = (List<HtmlElement>) page.getBody().getByXPath("//div[@class = 'item-content']/a");
-	
-	for (int i = 0; i < list.size(); i++) {
-	
-		String S = baseUrl + list.get(i).getByXPath("//div[@class = 'ui-panel is-transparent serp-results]/item-content(i)/a/href");
-		
-//		String loc = list.get(i).getElementsByTagName("td").get(2).getTextContent().trim();
-//		String jn = list.get(i).getElementsByTagName("td").get(1).getTextContent().trim();
-
-			
-		System.out.println("Job Url: "+S);
-//		System.out.println("Job loc: "+loc);
-//		System.out.println("Job Name: "+jn);
+		List <HtmlAnchor> anchorUrl = (List<HtmlAnchor>) page.getBody().getByXPath("//a[@class='item-title h4']");
+		List <HtmlSpan> spanArea = (List<HtmlSpan>) page.getBody().getByXPath("//span[@class='item-area']");
+        List <HtmlParagraph> spanCompany = (List<HtmlParagraph>) page.getBody().getByXPath("//p[@class='item-meta']");
+		for (HtmlAnchor row :anchorUrl) {
+		System.out.println("Job Url: "+Url+row.getAttribute("href").toString());
+		System.out.println("Job Tilte: "+row.getTextContent());
+//		System.out.println("Company Name: "+row.getTextContent());
 		System.out.println();
 	}
-		} catch (FailingHttpStatusCodeException e) {
-			System.out.println(" failed to connect site");
+		
+		for (HtmlParagraph row :spanCompany) {
+			System.out.println("Company Name: "+row.getTextContent());
 		}
-	}
-	
-	
-
-	private WebClient getWebClient() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
+}
+
 		
 
 
