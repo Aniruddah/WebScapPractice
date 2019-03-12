@@ -11,7 +11,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class WebScrapingTest {
 	private static final WebClient CLIENT= getClient();
-	private String Url = "https://bikroy.com/bn/ads/bangladesh/jobs";
+	private String Url = "https://bikroy.com/bn/ads/bangladesh/jobs?page=1";
 	private String baseUrl = "https://bikroy.com";
 //	private List<Job> jobList = new ArrayList<>();
 	
@@ -36,11 +36,12 @@ public class WebScrapingTest {
 		
 		for(int i=0;i<jobList.size();i++) {
 			
-			String jobTitle=jobList.get(i).getHtmlElementsByTagName("a").get(0).getTextContent();
-			String jobUrl=jobList.get(i).getHtmlElementsByTagName("a").get(0).getAttribute("href");
-			String companyName=jobList.get(i).getHtmlElementsByTagName("span").get(0).getTextContent();
-			String jobLocation=jobList.get(i).getHtmlElementsByTagName("p").get(2).getHtmlElementsByTagName("span").get(1).getTextContent();
-			String jobSalary=jobList.get(i).getHtmlElementsByTagName("p").get(1).getHtmlElementsByTagName("strong").get(0).getTextContent();
+			String jobTitle=jobList.get(i).getElementsByTagName("a").get(0).getTextContent();
+			String jobUrl=jobList.get(i).getElementsByTagName("a").get(0).getAttribute("href");
+			String companyName=jobList.get(i).getElementsByTagName("span").get(0).getTextContent();
+			String jobLocation=jobList.get(i).getElementsByTagName("p").get(2).getElementsByTagName("span").get(1).getTextContent();
+			String jobSalary=jobList.get(i).getElementsByTagName("p").get(1).getElementsByTagName("strong").get(0).getTextContent();
+			
 			
 			System.out.println("Job No. : "+(i+1));
 			System.out.println("Job title: "+jobTitle);
@@ -55,6 +56,12 @@ public class WebScrapingTest {
 			
 			
 		}
+		
+		List<HtmlElement> jobs1=(List<HtmlElement>) page.getBody().getByXPath("//span[@class='t-small summary-count']");
+		String totalJobs=jobs1.get(0).getTextContent().substring(0,3);
+		int totalJobPages=Integer.parseInt(totalJobs)/27;
+		System.out.println("Total Jobs: "+totalJobs);
+		System.out.println("Total Job Pages: "+totalJobPages);
 		
 
 	}
